@@ -1,0 +1,2 @@
+struct NONE {};
+NONE justnone;
