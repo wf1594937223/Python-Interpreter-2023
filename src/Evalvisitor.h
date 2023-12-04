@@ -17,7 +17,7 @@ Scope scope;
 
 int continue_fl, break_fl, return_fl;
 
-class EvalVisitor: public Python3BaseVisitor {
+class EvalVisitor: public Python3ParserBaseVisitor {
 
 //todo:override all methods of Python3BaseVisitor
 public:
