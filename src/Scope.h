@@ -5,8 +5,6 @@
 #include <any>
 #include <vector>
 #include <string>
-#include "None.h"
-#include "int2048.h"
 #include "checktype.h"
 #include "Python3ParserBaseVisitor.h"
 //using int2048 = long long;

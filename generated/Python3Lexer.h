@@ -1,6 +1,8 @@
 
 #include <list>
 #include <regex>
+#ifndef PYTHON_LEXER_H
+#define PYTHON_LEXER_H
 
 
 // Generated from Python3Lexer.g4 by ANTLR 4.13.1
@@ -164,3 +166,4 @@ private:
 
 };
 
+#endif

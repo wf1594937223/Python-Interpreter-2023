@@ -2,6 +2,8 @@
 // Generated from Python3Parser.g4 by ANTLR 4.13.1
 
 #pragma once
+#ifndef PYTHON_PARSER_H
+#define PYTHON_PARSER_H
 
 
 #include "antlr4-runtime.h"
@@ -659,3 +661,4 @@ public:
 private:
 };
 
+#endif

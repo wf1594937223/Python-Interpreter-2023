@@ -3,12 +3,6 @@
 #define PYTHON_INTERPRETER_EVALVISITOR_H
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 
-#include "Python3ParserBaseVisitor.h"
-#include "int2048.h"
-#include "Exception.h"
-#include "Scope.h"
-#include "None.h"
-#include "checktype.h"
 #include "calculate.h"
 #include <utility>
 //using int2048 = long long
@@ -236,7 +230,7 @@ public:
     virtual std::any visitComparison(Python3Parser::ComparisonContext *ctx) override {
         auto arrayari = ctx->arith_expr();
         auto arrayop = ctx->comp_op();
-        if (arrayari.size() == 1) return visitArith_expr(ctx->arith_expr());
+        if (arrayari.size() == 1) return visitArith_expr(arrayari[0]);
         std::vector< std::any > v;
         for (int i = 0; i < arrayari.size(); i++)
             v.push_back(visitArith_expr(arrayari[i]));

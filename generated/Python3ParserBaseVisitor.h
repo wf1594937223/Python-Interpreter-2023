@@ -2,6 +2,8 @@
 // Generated from Python3Parser.g4 by ANTLR 4.13.1
 
 #pragma once
+#ifndef PYTHON_PARSER_BASE_VISITOR_H
+#define PYTHON_PARSER_BASE_VISITOR_H
 
 
 #include "antlr4-runtime.h"
@@ -158,3 +160,4 @@ public:
 
 };
 
+#endif

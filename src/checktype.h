@@ -5,6 +5,7 @@
 # include <sstream>
 #include <iomanip>
 # include "int2048.h"
+# include "None.h"
 const double eps = 1e-9;
 //using int2048 = long long;
 using sjtu::int2048;

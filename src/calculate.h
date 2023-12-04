@@ -1,7 +1,5 @@
 #ifndef CALCULATE_H
 #define CALCULATE_H
-# include "checktype.h"
-# include "int2048.h"
 # include "Scope.h"
 # include <algorithm>
 # include <utility>
