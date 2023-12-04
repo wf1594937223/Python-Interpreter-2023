@@ -1,8 +1,11 @@
+#ifndef CALCULATE_H
+#define CALCULATE_H
 # include "checktype.h"
 # include "int2048.h"
 # include "Scope.h"
 # include <algorithm>
 # include <utility>
+using sjtu::int2048;
 std::pair<std::any, std::any> change(std::any x, std::any y)
 {
     int u = checktype(x), v = checktype(y), w = std::max(u, v);
@@ -52,7 +55,7 @@ std::any modany(std::any x, std::any y)
 {
     auto p = change(x, y);
     std::any u = p.first, v = p.second; int m = checktype(u);
-    return subany(x, mulany(idivany(x, y)));
+    return subany(x, mulany(y, idivany(x, y)));
 }
 bool lesany(std::any x, std::any y)
 {
@@ -108,3 +111,4 @@ bool noeqany(std::any x, std::any y)
     if (m == 3) return todouble(u) != todouble(v);
     if (m == 4) return tostr(u) != tostr(v);
 }
+#endif

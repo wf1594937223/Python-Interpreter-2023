@@ -1,13 +1,12 @@
 #pragma once
 #ifndef PYTHON_INTERPRETER_EVALVISITOR_H
 #define PYTHON_INTERPRETER_EVALVISITOR_H
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 
 #include "Python3ParserBaseVisitor.h"
 #include "int2048.h"
 #include "Exception.h"
 #include "Scope.h"
-#include "utils.h"
 #include "None.h"
 #include "checktype.h"
 #include "calculate.h"
@@ -34,9 +33,9 @@ public:
         // no func def
         scope.sto_func(ctx->NAME()->getText(), ctx->suite());
         //std::pair<std::vector<std::string>, std::vector<std::any>> p;
-        auto p = visitParameters(ctx->parameters());
-        scope.sto_functfp(p.first);
-        scope.sto_funcval(p.second);
+        auto p = std::any_cast <std::pair<std::vector<std::string>, std::vector<std::any>>> (visitParameters(ctx->parameters()));
+        scope.sto_functfp(ctx->NAME()->getText(), p.first);
+        scope.sto_funcval(ctx->NAME()->getText(), p.second);
         return justnone;
     }
 
@@ -50,13 +49,15 @@ public:
     }
 
     virtual std::any visitTypedargslist(Python3Parser::TypedargslistContext *ctx) override {
-        auto array_tfpdef = ctx->tfpdef()->getText();
+        auto array_tfpdef = ctx->tfpdef();
         auto array_val = ctx->test();
+        std::vector<std::string> vs;
         std::vector<std::any> v;
         int x = array_tfpdef.size(), y = (ctx->test()).size();
         for (int i = 1; i <= x - y; i++) v.push_back(justnone);
         for (int i = 0; i < y; i++) v.push_back(visitTest(array_val[i]));
-        return std::make_pair(array_tfpdef, v);
+        for (int i = 0; i < x; i++) vs.push_back(array_tfpdef[i]->NAME()->getText());
+        return std::make_pair(vs, v);
     }
 
     virtual std::any visitTfpdef(Python3Parser::TfpdefContext *ctx) override {
@@ -69,7 +70,7 @@ public:
     }//done
 
     virtual std::any visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx) override {
-        return visitSmall_stmt(ctx->smallstmt());
+        return visitSmall_stmt(ctx->small_stmt());
     }
 
     virtual std::any visitSmall_stmt(Python3Parser::Small_stmtContext *ctx) override {
@@ -81,7 +82,7 @@ public:
     virtual std::any visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx) override {
         auto testlistArray = ctx->testlist();
         if (ctx->augassign()) {
-            int2048 id = toint(visitAugassign(ctx->augassion()));
+            int2048 id = toint(visitAugassign(ctx->augassign()));
             std::any varData = visitTestlist(testlistArray[1]);
             std::string varName = testlistArray[0]->getText();
             std::any varData2 = scope.sco_que(varName);
@@ -90,7 +91,7 @@ public:
             if (id == 3) {scope.sto_any(varName, mulany(varData2, varData));}
             if (id == 4) {scope.sto_any(varName, divany(varData2, varData));}//div(varData2, varData);
             if (id == 5) {scope.sto_any(varName, idivany(varData2, varData));}//整除
-            if (id == 6) {scope.sto_any(varName, modany(var Data2, varData));}
+            if (id == 6) {scope.sto_any(varName, modany(varData2, varData));}
 
 //            throw Exception("", UNIMPLEMENTED);
             return justnone;
@@ -100,9 +101,13 @@ public:
             visitTestlist(testlistArray[0]);
             return justnone;
         }
-        std::any varData = visitTestlist(testlistArray[m - 1]);
+        std::vector<std::any> varData = std::any_cast <std::vector<std::any>> (visitTestlist(testlistArray[m - 1]));
         std::string varName;
-        scope.sto_any(varName, varData[0]);
+        for (int i = 0; i < m - 1; i++)
+        {
+            varName = testlistArray[i]->getText();
+            scope.sto_any(varName, varData[0]);
+        }
 //        scope.varRegister(varName, varData);
         return justnone;
     }
@@ -114,14 +119,14 @@ public:
         if (ctx->DIV_ASSIGN()) return 4;
         if (ctx->IDIV_ASSIGN()) return 5;
         if (ctx->MOD_ASSIGN()) return 6;
-        return visitChildren(ctx);
+        return justnone;
     }
 
     virtual std::any visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx) override {
         if (ctx->break_stmt()) return visitBreak_stmt(ctx->break_stmt());
-        if (ctx->continue_stmt()) return visitContinue_stmt(ctx->break_stmt());
+        if (ctx->continue_stmt()) return visitContinue_stmt(ctx->continue_stmt());
         if (ctx->return_stmt()) return visitReturn_stmt(ctx->return_stmt());
-        return visitChildren(ctx);
+        return justnone;
     }
 
     virtual std::any visitBreak_stmt(Python3Parser::Break_stmtContext *ctx) override {
@@ -149,12 +154,12 @@ public:
     virtual std::any visitIf_stmt(Python3Parser::If_stmtContext *ctx) override {
         auto arraytest = ctx->test();
         auto arraysuite = ctx->suite();
-        for (int i = 0; i < arraytest().size(); i++)
+        for (int i = 0; i < arraytest.size(); i++)
         {
             bool b = tobool(visitTest(arraytest[i]));
             if (b == true) return visitSuite(arraysuite[i]);
         }
-        if (ctx->ELSE()) return visitSuite(arraysuite[arraysuite().size() - 1]);
+        if (ctx->ELSE()) return visitSuite(arraysuite[arraysuite.size() - 1]);
     }
 
     virtual std::any visitWhile_stmt(Python3Parser::While_stmtContext *ctx) override {
@@ -163,7 +168,7 @@ public:
         {
             x = visitTest(ctx->test());
             if (tobool(x) == false) break;
-            visitSuite(ctx->Suite());
+            visitSuite(ctx->suite());
             if (break_fl)
             {
                 break_fl = 0;
@@ -172,7 +177,7 @@ public:
             if (continue_fl)
             {
                 continue_fl = 0;
-                return justnone;
+                continue;
             }
             if (return_fl)
                 return x;
@@ -184,9 +189,9 @@ public:
         if (ctx->simple_stmt()) return visitSimple_stmt(ctx->simple_stmt());
         auto arraystmt = ctx->stmt();
         std::any x;
-        for (int i = 0; i < arraystmt().size(); i++)
+        for (int i = 0; i < arraystmt.size(); i++)
         {
-            x = visitStmt(arraytest[i]);
+            x = visitStmt(arraystmt[i]);
             if (return_fl)
                 return x;
             if (break_fl)
@@ -207,7 +212,7 @@ public:
             return visitAnd_test(array[0]);
         int x = 0;
         for (int i = 0; i < array.size(); i++)
-            x = x | (visitAnd_test(array[i]));
+            x = x | tobool(visitAnd_test(array[i]));
         if (x) return true;
         else return false;
     }
@@ -218,7 +223,7 @@ public:
             return visitNot_test(array[0]);
         int x = 1;
         for (int i = 0; i < array.size(); i++)
-            x = x & (visitNot_test(array[i]));
+            x = x & tobool(visitNot_test(array[i]));
         if (x) return true;
         else return false;
     }
@@ -231,7 +236,7 @@ public:
     virtual std::any visitComparison(Python3Parser::ComparisonContext *ctx) override {
         auto arrayari = ctx->arith_expr();
         auto arrayop = ctx->comp_op();
-        if (arrayari.size() == 1) return visitArith_expr(ctx->arith_expr);
+        if (arrayari.size() == 1) return visitArith_expr(ctx->arith_expr());
         std::vector< std::any > v;
         for (int i = 0; i < arrayari.size(); i++)
             v.push_back(visitArith_expr(arrayari[i]));
@@ -253,8 +258,8 @@ public:
         if (ctx->LESS_THAN()) return 1;
         if (ctx->GREATER_THAN()) return 2;
         if (ctx->EQUALS()) return 3;
-        if (ctx->LE_EQ()) return 4;
-        if (ctx->GR_EQ()) return 5;
+        if (ctx->LT_EQ()) return 4;
+        if (ctx->GT_EQ()) return 5;
         if (ctx->NOT_EQ_2()) return 6;
         return justnone;
     }//<, >, =, <=, >=, !=
@@ -264,7 +269,7 @@ public:
         auto opArray = ctx->addorsub_op();
         std::any x = visitTerm(termArray[0]);
         for (int i = 1; i < termArray.size(); i++) {
-            int m = toint(visitAddorsub_op(opArray[i - 1]));
+            int2048 m = toint(visitAddorsub_op(opArray[i - 1]));
             if (m == 1) x = addany(x, visitTerm(termArray[i]));
             if (m == 2) x = subany(x, visitTerm(termArray[i]));
         }
@@ -282,7 +287,7 @@ public:
         auto opArray = ctx->muldivmod_op();
         std::any x = visitFactor(factorArray[0]);
         for (int i = 1; i < factorArray.size(); i++) {
-            int m = toint(visitMuldivmod_op(opArray[i - 1]));
+            int2048 m = toint(visitMuldivmod_op(opArray[i - 1]));
             if (m == 3) x = mulany(x, visitFactor(factorArray[i]));
             if (m == 4) x = divany(x, visitFactor(factorArray[i]));
             if (m == 5) x = idivany(x, visitFactor(factorArray[i]));
@@ -309,7 +314,7 @@ public:
     virtual std::any visitAtom_expr(Python3Parser::Atom_exprContext *ctx) override {
         if (!ctx->trailer()) return visitAtom(ctx->atom());
         auto functionName = ctx->atom()->getText();
-        auto argsArray = visitTrailer(ctx->trailer());
+        std::vector<std::any> argsArray = std::any_cast <std::vector<std::any>> (visitTrailer(ctx->trailer()));
         if (functionName == "bool") return tobool(argsArray[0]);
         if (functionName == "int") return toint(argsArray[0]);
         if (functionName == "float") return todouble(argsArray[0]);
@@ -321,38 +326,40 @@ public:
                 m = checktype(argsArray[i]);
                 if (m == 1)
                 {
-                    bool x = std::any_cast <bool> argsArray[i];
+                    bool x = tobool(argsArray[i]);
                     if(x == true) std::cout << "True ";
                     else std::cout << "False ";
                     continue;
                 }
                 if (m == 2)
                 {
-                    int2048 x = std::any_cast <int2048> argsArray[i];
+                    int2048 x = toint(argsArray[i]);
                     std::cout << x << ' ';
                 }
                 if (m == 3)
                 {
-                    double x = std::any_cast <double> argsArray[i];
+                    double x = todouble(argsArray[i]);
                     std::cout << std::fixed << std::setprecision(6) << x;
                     std::cout << ' ';
                 }
                 if (m == 4)
                 {
-                    std::string x = std::any_cast <std::string> argsArray[i];
+                    std::string x = tostr(argsArray[i]);
                     std::cout << x << ' ';
                 }
             }
             std::cout << std::endl;
             return justnone;
         }
-        std::vector<std::string> arraytfp = str2functfp[varName];
-        std::vector<std::any> arrayval = str2funcval[varName];
+        std::vector<std::string> arraytfp = scope.str2functfp[functionName];
+        std::vector<std::any> arrayval = scope.str2funcval[functionName];
         for (int i = 0; i < argsArray.size(); i++)
             arrayval[i] = argsArray[i];
         for (int i = 0; i < arraytfp.size(); i++)
             scope.sto_any(arraytfp[i], arrayval[i]);
-        return visitSuite(Scope.str2func[varName]);
+        std::any x = visitSuite(scope.str2func[functionName]);
+        return_fl = 0;
+        return x;
     }//内置函数在此
 
     virtual std::any visitTrailer(Python3Parser::TrailerContext *ctx) override {
@@ -365,20 +372,12 @@ public:
         {
             std::string s = ctx->NUMBER()->getText();
             int m = s.length(), fl = 0;
-            for (i = 0; i < m; i++) if (s[i] == '.') {fl = 1; break;}
-            if (fl) return stringToDouble(s);
-            else return stringToInt(s);
+            for (int i = 0; i < m; i++) if (s[i] == '.') {fl = 1; break;}
+            if (fl) return todouble(s);
+            else return toint(s);
         }
         else if (ctx->NAME())
             return scope.sco_que(ctx->NAME()->getText());
-        else if (ctx->STRING())
-        {
-            auto array = ctx->STRING();
-            std::string s = "";
-            for (int i = 0; i <= array.size(); i++)
-                s += array[i]->getText();
-            return s;
-        }
         else if (ctx->NONE())
             return justnone;
         else if (ctx->TRUE())
@@ -386,6 +385,14 @@ public:
         else if (ctx->FALSE())
             return (bool)false;
         else if (ctx->test()) return visitTest(ctx->test());
+        else
+        {
+            auto array = ctx->STRING();
+            std::string s = "";
+            for (int i = 0; i <= array.size(); i++)
+                s += array[i]->getText();
+            return s;
+        }
         //throw Exception("", UNIMPLEMENTED);
     }
 
@@ -409,12 +416,12 @@ public:
     virtual std::any visitArgument(Python3Parser::ArgumentContext *ctx) override {
         auto arraytest = ctx->test();
         if (arraytest.size() == 1) return visitTest(arraytest[0]);
-        std::string s = tostring(visitTest(arraytest[0]));
+        std::string s = tostr(visitTest(arraytest[0]));
         std::any x = visitTest(arraytest[1]); int m = checktype(x);
-        if (m == 1) sco.sto_bool(tobool(x));
-        if (m == 2) sco.sto_int(toint(x));
-        if (m == 3) sco.sto_double(todouble(x));
-        if (m == 4) sco.sto_str(tostr(x));
+        if (m == 1) scope.sto_any(s, tobool(x));
+        if (m == 2) scope.sto_any(s, toint(x));
+        if (m == 3) scope.sto_any(s, todouble(x));
+        if (m == 4) scope.sto_any(s, tostr(x));
         return x;
     }
 };

@@ -1,5 +1,5 @@
-#ifndef APPLE_PIE_SCOPE_H
-#define APPLE_PIE_SCOPE_H
+#ifndef SCOPE_H
+#define SCOPE_H
 
 #include <map>
 #include <any>
@@ -10,6 +10,7 @@
 #include "checktype.h"
 #include "Python3ParserBaseVisitor.h"
 //using int2048 = long long;
+using sjtu::int2048;
 
 class Scope {
 
@@ -20,10 +21,10 @@ class Scope {
         std::map<std::string, double> str2double;
         std::map<std::string, std::string> str2str;
         std::map<std::string, NONE> str2none;
+    public:
         std::map<std::string, Python3Parser::SuiteContext *> str2func;
         std::map<std::string, std::vector<std::string>> str2functfp;
         std::map<std::string, std::vector<std::any>> str2funcval;
-    public:
         int op;
 
         void sto_none(const std::string& varName) {
