@@ -7,9 +7,9 @@
 #include <utility>
 //using int2048 = long long
 
-Scope scope;
+inline Scope scope;
 
-int continue_fl, break_fl, return_fl;
+inline int continue_fl, break_fl, return_fl;
 
 class EvalVisitor: public Python3ParserBaseVisitor {
 
@@ -411,7 +411,8 @@ public:
         auto arraytest = ctx->test();
         if (arraytest.size() == 1) return visitTest(arraytest[0]);
         std::string s = tostr(visitTest(arraytest[0]));
-        std::any x = visitTest(arraytest[1]); int m = checktype(x);
+        std::any x = visitTest(arraytest[1]);
+        int m = checktype(x);
         if (m == 1) scope.sto_any(s, tobool(x));
         if (m == 2) scope.sto_any(s, toint(x));
         if (m == 3) scope.sto_any(s, todouble(x));

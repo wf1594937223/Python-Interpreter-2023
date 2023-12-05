@@ -7,6 +7,7 @@
 #include <string>
 #include "checktype.h"
 #include "Python3ParserBaseVisitor.h"
+#include "Python3Parser.h"
 //using int2048 = long long;
 using sjtu::int2048;
 

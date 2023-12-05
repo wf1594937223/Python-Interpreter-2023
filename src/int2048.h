@@ -89,18 +89,16 @@ public:
 };
 } // namespace sjtu
 
-#endif
-
-const int Amodd = 10000000;
-const int zip = 7;
-const long long Amod = 1ll * 4179340454199820289, Ag = 3, Agi = 1ll * 1393113484733273430;
+inline const int Amodd = 10000000;
+inline const int zip = 7;
+inline const long long Amod = 1ll * 4179340454199820289, Ag = 3, Agi = 1ll * 1393113484733273430;
 //const int modd = 10000;
 //const int zip = 4;
 //const long long mod = 1ll * 998244353, g = 3, gi = 1ll * 332748118;
-int Ar[(1 << 19) + 10];
-int lim;
-long long Ap[500010], Aq[500010];
-sjtu :: int2048 temp;
+inline int Ar[(1 << 19) + 10];
+inline int lim;
+inline long long Ap[500010], Aq[500010];
+inline sjtu :: int2048 temp;
 sjtu :: int2048 :: int2048 ()
 {
   int i;
@@ -586,3 +584,6 @@ sjtu :: int2048 &sjtu :: int2048 :: operator %= (const sjtu :: int2048 x)
   (*this) = y;
   return (*this);
 }
+
+
+#endif
